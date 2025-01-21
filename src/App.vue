@@ -48,5 +48,5 @@ import { ref } from 'vue';
   text-align: center;
   margin: 20px 0;
   font-weight: bold;
-},
+}
 </style>
