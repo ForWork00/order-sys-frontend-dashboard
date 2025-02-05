@@ -1,13 +1,14 @@
 <script setup>
 
 import {  RouterView } from 'vue-router';
-import { ref, onMounted, onBeforeUnmount } from 'vue';
+import { ref, onMounted, onBeforeUnmount ,watchEffect} from 'vue';
 import { useRouter } from 'vue-router';
+import Login from "@/views/Login.vue"; // 引入 Login.vue
 
 const isUserManagementOpen = ref(false); // 控制「用户管理」是否展開
 const isReportManagementOpen = ref(false); // 控制「報表管理」是否展開
 const isItemManagementOpen = ref(false); // 控制「報表管理」是否展開
-
+//判斷一次只能打開一個分類
 const toggleUserManagement = () => {
   isUserManagementOpen.value = !isUserManagementOpen.value;
   if (isUserManagementOpen.value) {
@@ -29,6 +30,27 @@ const toggleItemManagement = () => {
     isReportManagementOpen.value = false;
   }
 };
+// 監聽 localStorage 變化，確保 isLoggedIn 及時更新
+const isLoggedIn = ref(false);
+
+// 當 localStorage 存在 token 時，標記為已登入
+watchEffect(() => {
+  isLoggedIn.value = !!localStorage.getItem("token");
+});
+
+// 處理登入成功
+const handleLoginSuccess = () => {
+  console.log("1");
+  isLoggedIn.value = true;
+  router.push({path: '/home'}); // 登入成功後跳轉到首頁
+};
+
+// 處理登出
+const handleLogout = () => {
+  localStorage.removeItem("token");
+  isLoggedIn.value = false;
+};
+//router
 const router = useRouter();
   // 定義狀態
 const isMenuOpen = ref(false);
@@ -50,30 +72,32 @@ const toggleMenu = (event) => {
   // 在組件掛載時添加事件監聽器，並在銷毀前移除
   onMounted(() => {
       document.addEventListener('click', handleOutsideClick);
+      const token = localStorage.getItem("access_token");
+      isLoggedIn.value = !!token; // 檢查是否有 Token
     });
 
     onBeforeUnmount(() => {
       document.removeEventListener('click', handleOutsideClick);
     }); 
 
-  const gologin=()=>{
-  console.log("1")
-  router.push({ name: 'login' })
-} 
-const goregister=()=>{
-  router.push({ name: 'register' })
-} 
+
 
 </script>
 
 <template>
-  <el-container style="height:100vh">
+ <!-- 如果未登入，顯示登入頁面 -->
+ <Login v-if="!isLoggedIn" @login-success="handleLoginSuccess" />
+
+<!-- 如果已登入，顯示主頁面 -->
+<el-container v-else style="height:100vh">
+    
+    
     <!-- 側邊欄 -->
     <el-aside width="200px" style="background-color: #001529; color: white;">
       
       <div class="logo">儀錶板</div>
       <el-menu  
-        router
+      router
         class="custom-menu"
         background-color="#001529"
         text-color="#fff"
@@ -144,17 +168,18 @@ const goregister=()=>{
           <el-breadcrumb-item>首頁</el-breadcrumb-item>
           <el-breadcrumb-item>儀錶板</el-breadcrumb-item>
           <div class="dropdown">
-          <button @click="toggleMenu" class="login-button" >登入</button>
+          <button @click="toggleMenu" class="login-button" >登出</button>
           <div v-if="isMenuOpen" class="dropdown-menu">
           <ul>
-            <li @click="gologin">登入</li>
-            <li @click="goregister">註冊</li>
+            <li @click="isLoggedIn = false; localStorage.removeItem('token')" class="logout-button">登出</li>
+            <li @click="goRegister ">註冊</li>
           </ul>
 
         </div>
       </div>
         </el-breadcrumb>
       </el-header>
+      
       <el-main>
         <router-view />
       </el-main>

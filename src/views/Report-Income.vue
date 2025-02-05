@@ -1,3 +1,3 @@
 <template>
-    <h1>現金流量表</h1>
+    <h1>損益表</h1>
   </template>
