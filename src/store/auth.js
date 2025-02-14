@@ -1,4 +1,6 @@
 import { defineStore } from 'pinia';
+import.meta.evn.VITE_API_URL
+
 
 export const useAuthStore = defineStore('auth', {
   state: () => ({
