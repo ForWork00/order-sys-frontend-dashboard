@@ -9,7 +9,7 @@ const password = ref("");
 const confirmPassword = ref("");
 const errorMessage = ref("");
 const router = useRouter();
-const emit = defineEmits(["back-to-login"]); // ✅ 發送事件回到登入頁
+const emit = defineEmits(["back-to-login"]); // 定義 back-to-login 事件
 
 // 🚀 [註冊邏輯]
 const register = async () => {
@@ -24,13 +24,18 @@ const register = async () => {
   }
 
   try {
-    const response = await axios.post(`${VITE_API_URL}/backstage/register`, {
+    const response = await axios.post(`${VITE_API_URL}/backstage/registers`, {
       username: account.value,
-      password: password.value
+      password: password.value,
+      role: "user",
+      permissions: {
+        view: true, // ✅ 使用布林值，而不是字串
+        edit: false // ✅ 使用布林值，而不是字串
+      }
     });
 
     alert("註冊成功，請登入！");
-    emit("back-to-login"); // ✅ 註冊成功後回到登入頁
+     emit("back-to-login"); // ✅ 註冊成功後回到登入頁
   } catch (error) {
     errorMessage.value = "註冊失敗，帳號可能已存在";
   }
@@ -46,7 +51,7 @@ const register = async () => {
       <input v-model="password" type="password" placeholder="輸入密碼" />
       <input v-model="confirmPassword" type="password" placeholder="確認密碼" />
       <button @click="register" class="auth-button">註冊</button>
-      <button @click="goToLogin" class="auth-button">返回登入</button>
+      <button @click="emit('back-to-login')" class="auth-button">返回登入</button>
       <p v-if="errorMessage" class="error-message">{{ errorMessage }}</p>
     </div>
   </div>

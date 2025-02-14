@@ -78,17 +78,21 @@ const deleteMenu = async (_id) => {
 
 <template>
   <div class="container">
-    <h1>菜單列表</h1>
+    
+    <h1 >菜單列表</h1>
+    <div class="container-btn">
     <!-- 按鈕觸發獲取菜單 -->
     <button @click="fetchMenu" class="fetch-button">獲取菜單</button>
-
+    <input v-model="searchQuery" type="text" placeholder="搜尋菜品" class="search-box" />
+    <button @click="goToAddMenu" class="fetch-button">新增菜單</button>
+    </div>
     <p v-if="error" class="error">{{ error }}</p>
 
     <!-- 搜尋框 -->
-    <input v-model="searchQuery" type="text" placeholder="搜尋菜品..." class="search-box" />
+    
 
     <!-- 新增菜單按鈕 -->
-    <button @click="goToAddMenu" class="add-button">新增菜單</button>
+    
 
 
 
@@ -129,28 +133,43 @@ const deleteMenu = async (_id) => {
 </template>
 
 <style scoped>
+.container-btn{
+  display: flex;
+  justify-content: space-between;
+}
+h1 {
+  font-size: 30px; /* 標題字體大小 */
+  text-align: center; /* 標題居中 */
+  font-family: 'Roboto', sans-serif; 
+  font-weight: bold; /* 設置字體為加粗 */
+  margin-bottom: 20px; /* 標題下方的間距，根據需求可以調整 */
+}
+.container {
+  padding: 20px;
+  background: #fff;
+  border-radius: 10px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  max-width: 80%;
+  margin: auto;
+}
 .fetch-button {
-  background-color: #1890ff;
-  color: white;
-  font-size: 16px;
-  padding: 10px 20px;
+  background-color: #4CAF50; /* 綠色按鈕 */
+  color: white; /* 白色文字 */
   border: none;
+  padding: 10px 15px;
   border-radius: 5px;
   cursor: pointer;
-  margin-bottom: 15px;
+  font-size: 14px;
+  transition: background 0.3s ease;
+  margin-bottom:15px;
 }
 
 .fetch-button:hover {
-  background-color: #0056b3;
-}
-.container {
-  max-width: 800px;
-  margin: auto;
-  text-align: center;
+  background-color: #45a049; /* 深綠色，滑鼠懸停時變色 */
 }
 
 .search-box {
-  width: 100%;
+  width: 30%;
   padding: 10px;
   margin-bottom: 15px;
   border: 1px solid #ddd;
@@ -158,7 +177,7 @@ const deleteMenu = async (_id) => {
   font-size: 16px;
 }
 
-.add-button, .edit-button, .delete-button {
+ .edit-button, .delete-button {
   font-size: 14px;
   padding: 8px 12px;
   border: none;
@@ -166,16 +185,6 @@ const deleteMenu = async (_id) => {
   cursor: pointer;
   margin: 5px;
 }
-
-.add-button {
-  background-color: #1890ff;
-  color: white;
-}
-
-.add-button:hover {
-  background-color: #0056b3;
-}
-
 .edit-button {
   background-color: #f0ad4e;
   color: white;

@@ -4,6 +4,9 @@ import {  RouterView } from 'vue-router';
 import { ref, onMounted, onBeforeUnmount ,watchEffect} from 'vue';
 import { useRouter } from 'vue-router';
 import Login from "@/views/Login.vue"; // 引入 Login.vue
+import Register from "@/views/Register.vue"; 
+import axios from "axios";
+const VITE_API_URL = import.meta.env.VITE_API_URL;
 
 const isUserManagementOpen = ref(false); // 控制「用户管理」是否展開
 const isReportManagementOpen = ref(false); // 控制「報表管理」是否展開
@@ -30,9 +33,9 @@ const toggleItemManagement = () => {
     isReportManagementOpen.value = false;
   }
 };
-// 監聽 localStorage 變化，確保 isLoggedIn 及時更新
-const isLoggedIn = ref(false);
 
+const isLoggedIn = ref(false);// 是否顯示登入頁面
+const isRegistering = ref(false); // 是否顯示註冊頁面
 // 當 localStorage 存在 token 時，標記為已登入
 watchEffect(() => {
   isLoggedIn.value = !!localStorage.getItem("token");
@@ -44,16 +47,47 @@ const handleLoginSuccess = () => {
   isLoggedIn.value = true;
   router.push({path: '/home'}); // 登入成功後跳轉到首頁
 };
-
+// 切換到註冊頁面
+const goToRegister = () => {
+  isRegistering.value = true;
+};
+const goToLogin = () => {
+  isRegistering.value = false; // 切換回登入頁面
+};
 // 處理登出
-const handleLogout = () => {
-  localStorage.removeItem("token");
-  isLoggedIn.value = false;
+const handleLogout = async () => {
+  try {
+    const token = localStorage.getItem("token"); // 直接從 localStorage 取得 Token
+    if (!token) {
+      alert("未找到登入資訊，請重新登入");
+      return;
+    }
+
+    // 發送登出請求
+    await axios.post(
+      `${import.meta.env.VITE_API_URL}/backstage/logout`,
+      {}, // POST body 可為空
+      {
+        headers: {
+          Authorization: `Bearer ${token}`, // 設定 Authorization header
+        },
+      }
+    );
+
+    // 清除 token 並更新狀態
+    localStorage.removeItem("token");
+    isLoggedIn.value = false;
+
+    alert("登出成功，返回登入頁");
+  } catch (error) {
+    console.error("❌ 登出失敗：", error);
+    alert("登出失敗，請稍後再試");
+  }
 };
 //router
 const router = useRouter();
   // 定義狀態
-const isMenuOpen = ref(false);
+/*const isMenuOpen = ref(false);
 const toggleMenu = (event) => {
       event.stopPropagation(); // 防止事件冒泡
       isMenuOpen.value = !isMenuOpen.value;
@@ -61,7 +95,7 @@ const toggleMenu = (event) => {
      // 關閉功能列
      const closeMenu = () => {
       isMenuOpen.value = false;
-    };
+    };*/
 
     // 點擊外部時關閉功能列
     const handleOutsideClick = (event) => {
@@ -71,10 +105,10 @@ const toggleMenu = (event) => {
     };
   // 在組件掛載時添加事件監聽器，並在銷毀前移除
   onMounted(() => {
-      document.addEventListener('click', handleOutsideClick);
-      const token = localStorage.getItem("access_token");
-      isLoggedIn.value = !!token; // 檢查是否有 Token
-    });
+  // 頁面加載時，檢查 localStorage 中是否有 token
+  const token = localStorage.getItem("token");
+  isLoggedIn.value = !!token;
+});
 
     onBeforeUnmount(() => {
       document.removeEventListener('click', handleOutsideClick);
@@ -86,7 +120,8 @@ const toggleMenu = (event) => {
 
 <template>
  <!-- 如果未登入，顯示登入頁面 -->
- <Login v-if="!isLoggedIn" @login-success="handleLoginSuccess" />
+ <Register v-if="!isLoggedIn && isRegistering" @back-to-login="goToLogin" />
+  <Login v-else-if="!isLoggedIn" @login-success="handleLoginSuccess" @go-register="goToRegister" />
 
 <!-- 如果已登入，顯示主頁面 -->
 <el-container v-else style="height:100vh">
@@ -133,9 +168,13 @@ const toggleMenu = (event) => {
             </el-icon>
           </el-menu-item>
           <el v-if="isReportManagementOpen">
-            <el-menu-item class="sub-item" index="/Report-Balance">資產負債表</el-menu-item>
-            <el-menu-item class="sub-item" index="/Report-Income">損益表</el-menu-item>
+            <el-menu-item class="sub-item" index="/Report-IncomeandExpenditure">收入支出報表</el-menu-item>
             <el-menu-item class="sub-item" index="/Report-CashFlow">現金流量表</el-menu-item>
+            <el-menu-item class="sub-item" index="/Report-Balance">資產負債表</el-menu-item>
+            <el-menu-item class="sub-item" index="/Report-ProfitAndLoss">損益表</el-menu-item>
+
+            
+            
           </el>
 
 
@@ -165,17 +204,16 @@ const toggleMenu = (event) => {
     <el-container>
       <el-header   style="background-color: #f5f5f5; padding: 15px; height:50px">
         <el-breadcrumb separator="/">
-          <el-breadcrumb-item>首頁</el-breadcrumb-item>
-          <el-breadcrumb-item>儀錶板</el-breadcrumb-item>
+       
           <div class="dropdown">
-          <button @click="toggleMenu" class="login-button" >登出</button>
-          <div v-if="isMenuOpen" class="dropdown-menu">
+          <button @click="handleLogout" class="login-button" >登出</button>
+         <!--  <div v-if="isMenuOpen" class="dropdown-menu">
           <ul>
-            <li @click="isLoggedIn = false; localStorage.removeItem('token')" class="logout-button">登出</li>
+            <li @click="handleLogout" class="logout-button">登出</li>
             <li @click="goRegister ">註冊</li>
           </ul>
 
-        </div>
+        </div>-->
       </div>
         </el-breadcrumb>
       </el-header>

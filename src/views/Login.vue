@@ -3,12 +3,13 @@ import { ref, defineEmits } from "vue";
 import { useRouter } from "vue-router"; //  使用 Vue Router
 import axios from "axios";
 
+
 const VITE_API_URL = import.meta.env.VITE_API_URL;
 const account = ref("");
 const password = ref("");
 const errorMessage = ref("");
-const emit = defineEmits(["login-success"]); // 事件發送
 const router = useRouter(); //  獲取 Vue Router
+const emit = defineEmits(["login-success", "go-register"]); // 添加 go-register 事件
 
 //  [登入邏輯]
 const login = async () => {
@@ -38,7 +39,7 @@ const login = async () => {
       <input v-model="account" placeholder="輸入帳號" />
       <input v-model="password" type="password" placeholder="輸入密碼" />
       <button @click="login" class="auth-button">登入</button>
-      <button @click="register" class="auth-button">註冊</button>
+      <button @click="emit('go-register')" class="auth-button">註冊</button> 
       <p v-if="errorMessage" class="error-message">{{ errorMessage }}</p>
     </div>
   </div>

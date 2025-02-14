@@ -67,7 +67,7 @@ const goBack = () => {
 
 <template>
   <div class="container">
-    <h1>新增菜單</h1>
+    <h1 >新增菜單</h1>
 
     <form @submit.prevent="submitForm">
       <input v-model="formData._id" type="text" placeholder="菜單編號" required />
@@ -90,8 +90,15 @@ const goBack = () => {
 </template>
 
 <style scoped>
+h1 {
+  font-size: 30px; /* 標題字體大小 */
+  text-align: center; /* 標題居中 */
+  font-family: 'Roboto', sans-serif; 
+  font-weight: bold; /* 設置字體為加粗 */
+  margin-bottom: 20px; /* 標題下方的間距，根據需求可以調整 */
+}
 .container {
-  max-width: 400px;
+  max-width: 80%;
   margin: auto;
   text-align: center;
 }
@@ -99,6 +106,8 @@ const goBack = () => {
 form {
   display: flex;
   flex-direction: column;
+  text-align: center;
+  align-items: center; /* 垂直居中 */
 }
 /* 針對 Chrome, Safari, Edge, Opera 移除上下按鍵 */
 input[type="number"]::-webkit-outer-spin-button,
@@ -113,18 +122,25 @@ input[type="number"] {
 
 input,
 textarea {
-  width: 100%;
+  width: 50%;
   padding: 10px;
   margin-bottom: 10px;
   border: 1px solid #ddd;
   border-radius: 5px;
- 
+  text-align: center;
+  
 
 }
 
 .button-group {
   display: flex;
   justify-content: space-between;
+  padding: 10px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  flex: 1;
+  margin: 5px;
 }
 
 button {
